@@ -1,0 +1,5 @@
+title 0.6: New note
+
+browser->server: POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+server --> browser: Stattus code: 201,  {"message":"note created"}
+ 

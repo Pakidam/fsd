@@ -1,0 +1,13 @@
+title 0.5: Single page app
+
+browser->server: GET https://fullstack-exampleapp.herokuapp.com/spa
+server --> browser: HTML-code
+browser->server: GET https://fullstack-exampleapp.herokuapp.com/main.css
+server --> browser: main.css
+browser->server: GET https://fullstack-exampleapp.herokuapp.com/spa.js
+server --> browser: spa.js
+browser->server: GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: [{ content: "HTML is easy", date: "2019-05-23" }, ...]
+note over browser:
+The logic of rendering the notes is handled by the browser.
+end note
