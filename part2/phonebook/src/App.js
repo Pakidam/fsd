@@ -1,24 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Search from "./components/Search";
 import AddContact from "./components/AddContact";
 import DisplayNumbers from "./components/DisplayNumbers";
+import personService from "./services/persons";
+import Notification from "./components/Notification";
+const url = "http://localhost:3001/persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: 74567 },
-    { name: "Ada Lovelace", number: "39-44-5323523" },
-    { name: "Dan Abramov", number: "12-43-234345" },
-    { name: "Mary Poppendieck", number: "39-23-6423122" }
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchName, setSearchName] = useState("");
   const [displaySearch, setDisplaySearch] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  useEffect(() => {
+    axios.get(url).then(response => {
+      setPersons(response.data);
+    });
+  }, []);
+
+  const deleteContact = id => {
+    const updatedList = persons.filter(n => n.id !== id);
+
+    personService.remove(id).then(returnedPerson => {
+      setPersons(updatedList);
+    });
+  };
 
   const displayPersons = () =>
-    persons.map((element, index) => (
-      <div key={index}>
-        {element.name} {element.number}
+    persons.map(element => (
+      <div key={element.id}>
+        {element.name} {element.number}{" "}
+        <button onClick={() => deleteContact(element.id)}>delete</button>
       </div>
     ));
 
@@ -55,7 +70,13 @@ const App = () => {
     if (persons.some(person => person.name === newPerson.name)) {
       alert(`${newPerson.name} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(newPerson));
+      personService.add(newPerson).then(person => {
+        setPersons(persons.concat(newPerson));
+        setErrorMessage(` Added ${newPerson.name}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
     }
     setNewName("");
     setNewNumber("");
@@ -63,6 +84,7 @@ const App = () => {
 
   return (
     <div>
+      {errorMessage !== null && <Notification message={errorMessage} />}
       <Search
         onSubmit={searchPerson}
         value={searchName}
